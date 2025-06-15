@@ -11,7 +11,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		fmt.Printf("Pokedex > ")
+		fmt.Print("Pokedex > ")
 
 		if !scanner.Scan() {
 			// Handle EOF or error
