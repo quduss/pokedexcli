@@ -13,6 +13,11 @@ type cliCommand struct {
 	callback    func() error
 }
 
+type config struct {
+	Next     *string
+	Previous *string
+}
+
 var commands map[string]cliCommand
 
 func cleanInput(text string) []string {
