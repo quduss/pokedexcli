@@ -2,7 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -52,6 +55,70 @@ func commandHelp() error {
 	for _, cmd := range commands {
 		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
+	return nil
+}
+
+func commandMap(cfg *config) error {
+	url := "https://pokeapi.co/api/v2/location-area/"
+	if cfg.Next != nil {
+		url = *cfg.Next
+	}
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	var parsed LocationAreaResponse
+	err = json.Unmarshal(body, &parsed)
+	if err != nil {
+		return err
+	}
+
+	for _, area := range parsed.Results {
+		fmt.Println(area.Name)
+	}
+
+	cfg.Next = parsed.Next
+	cfg.Previous = parsed.Previous
+	return nil
+}
+
+func commandMapBack(cfg *config) error {
+	if cfg.Previous == nil {
+		fmt.Println("you're on the first page")
+		return nil
+	}
+
+	resp, err := http.Get(*cfg.Previous)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	var parsed LocationAreaResponse
+	err = json.Unmarshal(body, &parsed)
+	if err != nil {
+		return err
+	}
+
+	for _, area := range parsed.Results {
+		fmt.Println(area.Name)
+	}
+
+	cfg.Next = parsed.Next
+	cfg.Previous = parsed.Previous
 	return nil
 }
 
