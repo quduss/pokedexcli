@@ -18,6 +18,16 @@ type config struct {
 	Previous *string
 }
 
+type LocationAreaResponse struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
+}
+
 var commands map[string]cliCommand
 
 func cleanInput(text string) []string {
