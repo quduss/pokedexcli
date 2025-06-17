@@ -13,7 +13,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 type config struct {
@@ -41,14 +41,14 @@ func cleanInput(text string) []string {
 }
 
 // commandExit prints a goodbye message and exits the program
-func commandExit() error {
+func commandExit(*config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
 // commandHelp prints all registered commands and their descriptions
-func commandHelp() error {
+func commandHelp(*config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
