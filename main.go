@@ -151,6 +151,8 @@ func init() {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
+	cfg := &config{}
+
 	for {
 		fmt.Print("Pokedex > ")
 
@@ -167,7 +169,7 @@ func main() {
 		command := words[0]
 
 		if cmd, ok := commands[command]; ok {
-			err := cmd.callback()
+			err := cmd.callback(cfg)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			}
