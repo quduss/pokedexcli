@@ -15,3 +15,12 @@ type Cache struct {
 	cache    map[string]cacheEntry
 	interval time.Duration
 }
+
+func NewCache(interval time.Duration) *Cache {
+	c := &Cache{
+		cache:    make(map[string]cacheEntry),
+		interval: interval,
+	}
+	go c.reapLoop()
+	return c
+}
