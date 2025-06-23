@@ -68,21 +68,31 @@ func commandMap(cfg *config) error {
 		url = *cfg.Next
 	}
 
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
 	var parsed LocationAreaResponse
-	err = json.Unmarshal(body, &parsed)
-	if err != nil {
-		return err
+	if data, ok := cfg.Cache.Get(url); ok {
+
+		err := json.Unmarshal(data, &parsed)
+		if err != nil {
+			return err
+		}
+	} else {
+		resp, err := http.Get(url)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		cfg.Cache.Add(url, body)
+
+		err = json.Unmarshal(body, &parsed)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, area := range parsed.Results {
@@ -100,21 +110,31 @@ func commandMapBack(cfg *config) error {
 		return nil
 	}
 
-	resp, err := http.Get(*cfg.Previous)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
 	var parsed LocationAreaResponse
-	err = json.Unmarshal(body, &parsed)
-	if err != nil {
-		return err
+	if data, ok := cfg.Cache.Get(*cfg.Previous); ok {
+
+		err := json.Unmarshal(data, &parsed)
+		if err != nil {
+			return err
+		}
+	} else {
+		resp, err := http.Get(*cfg.Previous)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		cfg.Cache.Add(*cfg.Previous, body)
+
+		err = json.Unmarshal(body, &parsed)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, area := range parsed.Results {
