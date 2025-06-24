@@ -192,9 +192,10 @@ func main() {
 		}
 
 		command := words[0]
+		args := words[1:]
 
 		if cmd, ok := commands[command]; ok {
-			err := cmd.callback(cfg)
+			err := cmd.callback(cfg, args)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			}
