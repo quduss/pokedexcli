@@ -227,6 +227,11 @@ func init() {
 			description: "Go back to the previous 20 location areas",
 			callback:    commandMapBack,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explore a location area to see which Pokémon are there",
+			callback:    commandExplore,
+		},
 	}
 }
 
