@@ -146,6 +146,64 @@ func commandMapBack(cfg *config, args []string) error {
 	return nil
 }
 
+func commandExplore(cfg *config, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("please provide a location area to explore")
+	}
+
+	locationArea := args[0]
+	url := "https://pokeapi.co/api/v2/location-area/" + locationArea
+
+	fmt.Printf("Exploring %s...\n", locationArea)
+
+	// Check cache first
+	cachedData, ok := cfg.Cache.Get(url)
+	var data []byte
+	var err error
+
+	if ok {
+		data = cachedData
+		fmt.Println("Using cached data.")
+	} else {
+		resp, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("failed to fetch location area: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != 200 {
+			return fmt.Errorf("received status code %d", resp.StatusCode)
+		}
+
+		data, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read response body: %w", err)
+		}
+
+		cfg.Cache.Add(url, data)
+	}
+
+	var parsed struct {
+		PokemonEncounters []struct {
+			Pokemon struct {
+				Name string `json:"name"`
+			} `json:"pokemon"`
+		} `json:"pokemon_encounters"`
+	}
+
+	err = json.Unmarshal(data, &parsed)
+	if err != nil {
+		return fmt.Errorf("failed to parse JSON: %w", err)
+	}
+
+	fmt.Println("Found Pokemon:")
+	for _, p := range parsed.PokemonEncounters {
+		fmt.Printf(" - %s\n", p.Pokemon.Name)
+	}
+
+	return nil
+}
+
 // Initialize command registry after all functions are declared
 func init() {
 	commands = map[string]cliCommand{
