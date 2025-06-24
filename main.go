@@ -45,14 +45,14 @@ func cleanInput(text string) []string {
 }
 
 // commandExit prints a goodbye message and exits the program
-func commandExit(*config) error {
+func commandExit(cfg *config, args []string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
 // commandHelp prints all registered commands and their descriptions
-func commandHelp(*config) error {
+func commandHelp(cfg *config, args []string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
@@ -62,7 +62,7 @@ func commandHelp(*config) error {
 	return nil
 }
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args []string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if cfg.Next != nil {
 		url = *cfg.Next
@@ -104,7 +104,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapBack(cfg *config) error {
+func commandMapBack(cfg *config, args []string) error {
 	if cfg.Previous == nil {
 		fmt.Println("you're on the first page")
 		return nil
